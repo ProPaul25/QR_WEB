@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+	<link rel="icon" type="image/png" href="assets/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #6a11cb;
+            outline: none;
+        }
+
+        button {
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
+        }
+
+        #qrcode {
+            margin-top: 25px;
+            text-align: center;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .field-group {
+            margin-left: 20px;
+            border-left: 2px solid #ddd;
+            padding-left: 10px;
+            margin-top: 10px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #2575fc, #6a11cb);
+            margin-left: 10px;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(37, 117, 252, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+      <img src="assets/logo.png" alt="QR Code Generator Logo" style="width: 150px; display: block; margin: 0 auto 20px;">
+
+        <h1>QR Code Generator</h1>
+        
+        <div class="input-group">
+            <label for="dataType">Select Data Type:</label>
+            <select id="dataType" onchange="toggleFields()">
+                <option value="url">URL</option>
+                <option value="email">Email</option>
+                <option value="phone">Phone Number</option>
+                <option value="sms">SMS</option>
+                <option value="wifi">WiFi</option>
+                <option value="text">Plain Text</option>
+            </select>
+        </div>
+
+        <!-- URL Input -->
+        <div id="urlFields">
+            <div class="input-group">
+                <label for="url">Website URL:</label>
+                <input type="url" id="url" placeholder="https://example.com">
+            </div>
+        </div>
+
+        <!-- Email Input -->
+        <div id="emailFields" class="hidden">
+            <div class="input-group">
+                <label for="emailAddress">Email Address:</label>
+                <input type="email" id="emailAddress" placeholder="recipient@example.com">
+            </div>
+            <div class="input-group">
+                <label for="subject">Subject:</label>
+                <input type="text" id="subject">
+            </div>
+            <div class="input-group">
+                <label for="body">Message:</label>
+                <textarea id="body"></textarea>
+            </div>
+        </div>
+
+        <!-- Phone Input -->
+        <div id="phoneFields" class="hidden">
+            <div class="input-group">
+                <label for="phoneNumber">Phone Number:</label>
+                <input type="tel" id="phoneNumber" placeholder="+1234567890">
+            </div>
+        </div>
+
+        <!-- SMS Input -->
+        <div id="smsFields" class="hidden">
+            <div class="input-group">
+                <label for="smsNumber">Phone Number:</label>
+                <input type="tel" id="smsNumber" placeholder="+1234567890">
+            </div>
+            <div class="input-group">
+                <label for="smsMessage">Message:</label>
+                <textarea id="smsMessage"></textarea>
+            </div>
+        </div>
+
+        <!-- WiFi Input -->
+        <div id="wifiFields" class="hidden">
+            <div class="input-group">
+                <label for="ssid">Network Name (SSID):</label>
+                <input type="text" id="ssid">
+            </div>
+            <div class="input-group">
+                <label for="password">Password:</label>
+                <input type="text" id="password">
+            </div>
+            <div class="input-group">
+                <label for="encryption">Encryption Type:</label>
+                <select id="encryption">
+                    <option value="WPA">WPA/WPA2</option>
+                    <option value="WEP">WEP</option>
+                    <option value="nopass">None</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>
+                    <input type="checkbox" id="hiddenSSID"> Hidden Network
+                </label>
+            </div>
+        </div>
+
+        <!-- Plain Text Input -->
+        <div id="textFields" class="hidden">
+            <div class="input-group">
+                <label for="textContent">Text Content:</label>
+                <textarea id="textContent"></textarea>
+            </div>
+        </div>
+
+        <button onclick="generateQR()">Generate QR Code</button>
+        <button onclick="downloadQR()" id="downloadBtn" class="hidden download-btn">Download QR Code</button>
+        <div id="qrcode"></div>
+    </div>
+
+    <script>
+        let qrcode = null;
+
+        function toggleFields() {
+            const dataType = document.getElementById('dataType').value;
+            document.querySelectorAll('[id$="Fields"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`${dataType}Fields`).classList.remove('hidden');
+        }
+
+        function generateQR() {
+            const dataType = document.getElementById('dataType').value;
+            let data = '';
+
+            switch(dataType) {
+                case 'url':
+                    data = document.getElementById('url').value;
+                    if (!data.startsWith('http')) data = `http://${data}`;
+                    break;
+                
+                case 'email':
+                    const email = document.getElementById('emailAddress').value;
+                    const subject = encodeURIComponent(document.getElementById('subject').value);
+                    const body = encodeURIComponent(document.getElementById('body').value);
+                    data = `mailto:${email}?subject=${subject}&body=${body}`;
+                    break;
+                
+                case 'phone':
+                    data = `tel:${document.getElementById('phoneNumber').value}`;
+                    break;
+                
+                case 'sms':
+                    data = `smsto:${document.getElementById('smsNumber').value}:${encodeURIComponent(document.getElementById('smsMessage').value)}`;
+                    break;
+                
+                case 'wifi':
+                    const ssid = encodeURIComponent(document.getElementById('ssid').value);
+                    const password = encodeURIComponent(document.getElementById('password').value);
+                    const encryption = document.getElementById('encryption').value;
+                    const hidden = document.getElementById('hiddenSSID').checked ? 'true' : 'false';
+                    data = `WIFI:S:${ssid};T:${encryption};P:${password};H:${hidden};;`;
+                    break;
+                
+                case 'text':
+                    data = document.getElementById('textContent').value;
+                    break;
+            }
+
+            if (!data) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            const qrcodeDiv = document.getElementById('qrcode');
+            qrcodeDiv.innerHTML = '';
+            
+            qrcode = new QRCode(qrcodeDiv, {
+                text: data,
+                width: 256,
+                height: 256,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            document.getElementById('downloadBtn').classList.remove('hidden');
+        }
+
+        function downloadQR() {
+            const canvas = document.querySelector('#qrcode canvas');
+            if (!canvas) {
+                alert('Generate a QR code first!');
+                return;
+            }
+            const link = document.createElement('a');
+            link.download = 'qrcode.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+    </script>
+</body>
+</html>
